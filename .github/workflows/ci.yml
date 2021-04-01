@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tests:
+    name: "Golang ${{ matrix.go-version }} ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      matrix:
+        go-version: ['1.14', '1.15', '1.16']
+        os: [ubuntu-latest]
+
+    env:
+      GOENV_VERSION: "${{ matrix.go-version }}"
+
+    steps:
+      - name: Check out code into Go module directory
+        uses: actions/checkout@v2
+
+      - name: Set up golang ${{ matrix.go-version }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Go mod package cache
+        uses: actions/cache@v2
+        with:
+          path: $GOPATH/pkg/mod
+          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+
+      - name: Before tests
+        if: ${{ env.GOENV_VERSION != '1.16' }}
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint
+      - name: Before tests 1.16
+        if: ${{ env.GOENV_VERSION == '1.16' }}
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - name: Run tests and lint
+        run: |
+          golangci-lint run --timeout=10m --tests=false
+          go test -v -count=1 ./...

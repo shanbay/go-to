@@ -2,7 +2,7 @@ package to
 
 func Int_IntPtr(i int) *int { return &i }
 func IntPtr_Int(i *int, opt ...Option) int {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(int)
 	}
 	return *i
@@ -10,7 +10,7 @@ func IntPtr_Int(i *int, opt ...Option) int {
 
 func IntSlice_IntSlicePtr(i []int) *[]int { return &i }
 func IntSlicePtr_IntSlice(i *[]int, opt ...Option) []int {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]int)
 	}
 	return *i
@@ -39,7 +39,7 @@ func Int16Ptr_Int(i *int16, opt ...Option) int {
 	return Int16_Int(Int16Ptr_Int16(i, opt...))
 }
 func Int16Ptr_Int16(i *int16, opt ...Option) int16 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(int16)
 	}
 	return *i
@@ -79,7 +79,7 @@ func Int16SlicePtr_IntSlice(i *[]int16, opt ...Option) []int {
 	return Int16Slice_IntSlice(Int16SlicePtr_Int16Slice(i, opt...))
 }
 func Int16SlicePtr_Int16Slice(i *[]int16, opt ...Option) []int16 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]int16)
 	}
 	return *i
@@ -111,7 +111,7 @@ func Int32Ptr_Int(i *int32, opt ...Option) int {
 	return Int32_Int(Int32Ptr_Int32(i, opt...))
 }
 func Int32Ptr_Int32(i *int32, opt ...Option) int32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(int32)
 	}
 	return *i
@@ -151,7 +151,7 @@ func Int32SlicePtr_IntSlice(i *[]int32, opt ...Option) []int {
 	return Int32Slice_IntSlice(Int32SlicePtr_Int32Slice(i, opt...))
 }
 func Int32SlicePtr_Int32Slice(i *[]int32, opt ...Option) []int32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]int32)
 	}
 	return *i
@@ -183,7 +183,7 @@ func Int64Ptr_Int(i *int64, opt ...Option) int {
 	return Int64_Int(Int64Ptr_Int64(i, opt...))
 }
 func Int64Ptr_Int64(i *int64, opt ...Option) int64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(int64)
 	}
 	return *i
@@ -223,7 +223,7 @@ func Int64SlicePtr_IntSlice(i *[]int64, opt ...Option) []int {
 	return Int64Slice_IntSlice(Int64SlicePtr_Int64Slice(i, opt...))
 }
 func Int64SlicePtr_Int64Slice(i *[]int64, opt ...Option) []int64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]int64)
 	}
 	return *i
@@ -255,7 +255,7 @@ func Int8Ptr_Int(i *int8, opt ...Option) int {
 	return Int8_Int(Int8Ptr_Int8(i, opt...))
 }
 func Int8Ptr_Int8(i *int8, opt ...Option) int8 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(int8)
 	}
 	return *i
@@ -295,7 +295,7 @@ func Int8SlicePtr_IntSlice(i *[]int8, opt ...Option) []int {
 	return Int8Slice_IntSlice(Int8SlicePtr_Int8Slice(i, opt...))
 }
 func Int8SlicePtr_Int8Slice(i *[]int8, opt ...Option) []int8 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]int8)
 	}
 	return *i
@@ -327,7 +327,7 @@ func UintPtr_Int(i *uint, opt ...Option) int {
 	return Uint_Int(UintPtr_Uint(i, opt...))
 }
 func UintPtr_Uint(i *uint, opt ...Option) uint {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(uint)
 	}
 	return *i
@@ -367,7 +367,7 @@ func UintSlicePtr_IntSlice(i *[]uint, opt ...Option) []int {
 	return UintSlice_IntSlice(UintSlicePtr_UintSlice(i, opt...))
 }
 func UintSlicePtr_UintSlice(i *[]uint, opt ...Option) []uint {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]uint)
 	}
 	return *i
@@ -399,7 +399,7 @@ func Uint16Ptr_Int(i *uint16, opt ...Option) int {
 	return Uint16_Int(Uint16Ptr_Uint16(i, opt...))
 }
 func Uint16Ptr_Uint16(i *uint16, opt ...Option) uint16 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(uint16)
 	}
 	return *i
@@ -439,7 +439,7 @@ func Uint16SlicePtr_IntSlice(i *[]uint16, opt ...Option) []int {
 	return Uint16Slice_IntSlice(Uint16SlicePtr_Uint16Slice(i, opt...))
 }
 func Uint16SlicePtr_Uint16Slice(i *[]uint16, opt ...Option) []uint16 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]uint16)
 	}
 	return *i
@@ -471,7 +471,7 @@ func Uint32Ptr_Int(i *uint32, opt ...Option) int {
 	return Uint32_Int(Uint32Ptr_Uint32(i, opt...))
 }
 func Uint32Ptr_Uint32(i *uint32, opt ...Option) uint32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(uint32)
 	}
 	return *i
@@ -511,7 +511,7 @@ func Uint32SlicePtr_IntSlice(i *[]uint32, opt ...Option) []int {
 	return Uint32Slice_IntSlice(Uint32SlicePtr_Uint32Slice(i, opt...))
 }
 func Uint32SlicePtr_Uint32Slice(i *[]uint32, opt ...Option) []uint32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]uint32)
 	}
 	return *i
@@ -543,7 +543,7 @@ func Uint64Ptr_Int(i *uint64, opt ...Option) int {
 	return Uint64_Int(Uint64Ptr_Uint64(i, opt...))
 }
 func Uint64Ptr_Uint64(i *uint64, opt ...Option) uint64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(uint64)
 	}
 	return *i
@@ -583,7 +583,7 @@ func Uint64SlicePtr_IntSlice(i *[]uint64, opt ...Option) []int {
 	return Uint64Slice_IntSlice(Uint64SlicePtr_Uint64Slice(i, opt...))
 }
 func Uint64SlicePtr_Uint64Slice(i *[]uint64, opt ...Option) []uint64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]uint64)
 	}
 	return *i
@@ -615,7 +615,7 @@ func Uint8Ptr_Int(i *uint8, opt ...Option) int {
 	return Uint8_Int(Uint8Ptr_Uint8(i, opt...))
 }
 func Uint8Ptr_Uint8(i *uint8, opt ...Option) uint8 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(uint8)
 	}
 	return *i
@@ -655,7 +655,7 @@ func Uint8SlicePtr_IntSlice(i *[]uint8, opt ...Option) []int {
 	return Uint8Slice_IntSlice(Uint8SlicePtr_Uint8Slice(i, opt...))
 }
 func Uint8SlicePtr_Uint8Slice(i *[]uint8, opt ...Option) []uint8 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]uint8)
 	}
 	return *i
@@ -2754,7 +2754,7 @@ func Uint8SlicePtr_Uint64SlicePtr(i *[]uint8, opt ...Option) *[]uint64 {
 
 func Float32_Float32Ptr(i float32) *float32 { return &i }
 func Float32Ptr_Float32(i *float32, opt ...Option) float32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(float32)
 	}
 	return *i
@@ -2762,7 +2762,7 @@ func Float32Ptr_Float32(i *float32, opt ...Option) float32 {
 
 func Float32Slice_Float32SlicePtr(i []float32) *[]float32 { return &i }
 func Float32SlicePtr_Float32Slice(i *[]float32, opt ...Option) []float32 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]float32)
 	}
 	return *i
@@ -2791,7 +2791,7 @@ func Float64Ptr_Float32(i *float64, opt ...Option) float32 {
 	return Float64_Float32(Float64Ptr_Float64(i, opt...))
 }
 func Float64Ptr_Float64(i *float64, opt ...Option) float64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(float64)
 	}
 	return *i
@@ -2831,7 +2831,7 @@ func Float64SlicePtr_Float32Slice(i *[]float64, opt ...Option) []float32 {
 	return Float64Slice_Float32Slice(Float64SlicePtr_Float64Slice(i, opt...))
 }
 func Float64SlicePtr_Float64Slice(i *[]float64, opt ...Option) []float64 {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]float64)
 	}
 	return *i
@@ -2842,7 +2842,7 @@ func Float64SlicePtr_Float32SlicePtr(i *[]float64, opt ...Option) *[]float32 {
 
 func String_StringPtr(i string) *string { return &i }
 func StringPtr_String(i *string, opt ...Option) string {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(string)
 	}
 	return *i
@@ -2850,7 +2850,7 @@ func StringPtr_String(i *string, opt ...Option) string {
 
 func StringSlice_StringSlicePtr(i []string) *[]string { return &i }
 func StringSlicePtr_StringSlice(i *[]string, opt ...Option) []string {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]string)
 	}
 	return *i
@@ -2858,7 +2858,7 @@ func StringSlicePtr_StringSlice(i *[]string, opt ...Option) []string {
 
 func Bool_BoolPtr(i bool) *bool { return &i }
 func BoolPtr_Bool(i *bool, opt ...Option) bool {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new(bool)
 	}
 	return *i
@@ -2866,7 +2866,7 @@ func BoolPtr_Bool(i *bool, opt ...Option) bool {
 
 func BoolSlice_BoolSlicePtr(i []bool) *[]bool { return &i }
 func BoolSlicePtr_BoolSlice(i *[]bool, opt ...Option) []bool {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new([]bool)
 	}
 	return *i

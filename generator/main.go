@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
@@ -29,7 +30,17 @@ var stringTypes = []string{"string"}
 
 var boolTypes = []string{"bool"}
 
-const writeFileName = "../to.go"
+var allTypesSlice = [][]string{
+	intTypes,
+	floatTypes,
+	stringTypes,
+	boolTypes,
+}
+
+const (
+	writeFileName     = "../to.go"
+	writeTestFileName = "../to_test.go"
+)
 
 func main() {
 	var err error
@@ -39,31 +50,51 @@ func main() {
 		panic(err)
 	}
 	res := []string{"package to\n"}
-	res = append(res, product(t, intTypes))
-	res = append(res, product(t, floatTypes))
-	res = append(res, product(t, stringTypes))
-	res = append(res, product(t, boolTypes))
+	testRes := []string{`package to
+import "testing"
+`}
+	for _, types := range allTypesSlice {
+		toRes, toTestRes := product(t, types)
+		res = append(res, toRes)
+		testRes = append(testRes, toTestRes)
+	}
+	// to.go
 	out := []byte(strings.Join(res, "\n"))
 	if out, err = imports.Process(writeFileName, out, nil); err != nil {
+		fmt.Println(res)
 		panic(err)
 	}
 	if err := os.WriteFile(writeFileName, out, 0644); err != nil {
 		panic(err)
 	}
+	// to_test.go
+	out = []byte(strings.Join(testRes, "\n"))
+	if out, err = imports.Process(writeTestFileName, out, nil); err != nil {
+		panic(err)
+	}
+	if err := os.WriteFile(writeTestFileName, out, 0644); err != nil {
+		panic(err)
+	}
 }
 
-func product(t *template.Template, types []string) string {
-	res := []string{}
-	exists := map[string]struct{}{}
+func product(t *template.Template, types []string) (string, string) {
+	res, testsRes := []string{}, []string{}
+	exists, testsExists := map[string]struct{}{}, map[string]struct{}{}
 	for _, t1 := range types {
 		for _, t2 := range types {
 			// funcs
-			res = append(res, genFuncs(t, []string{t1, t2, "*" + t1, "*" + t2}, exists))
+			basicTypes := []string{t1, t2, "*" + t1, "*" + t2}
+			res = append(res, genFuncs(t, basicTypes, exists))
+			testsRes = append(testsRes, genTestFuncs(t, basicTypes, testsExists))
 			// slice funcs
-			res = append(res, genFuncs(t, []string{"[]" + t1, "[]" + t2, "*[]" + t1, "*[]" + t2}, exists))
+			sliceTypes := []string{"[]" + t1, "[]" + t2, "*[]" + t1, "*[]" + t2}
+			res = append(res, genFuncs(t, sliceTypes, exists))
+			testsRes = append(testsRes, genTestFuncs(t, sliceTypes, testsExists))
 		}
 	}
-	return strings.Join(res, "\n") + "\n"
+	toRes := strings.Join(res, "\n") + "\n"
+	toTestRes := strings.Join(testsRes, "\n") + "\n"
+	return toRes, toTestRes
 }
 
 func genFuncs(t *template.Template, allTypes []string, exists map[string]struct{}) string {
@@ -81,6 +112,31 @@ func genFuncs(t *template.Template, allTypes []string, exists map[string]struct{
 			exists[existsKey] = struct{}{}
 
 			if err := t.ExecuteTemplate(w, getTmplName(from, to), &fromTo{From: from, To: to}); err != nil {
+				panic(err)
+			}
+		}
+	}
+	if err := w.Flush(); err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
+
+func genTestFuncs(t *template.Template, allTypes []string, exists map[string]struct{}) string {
+	var buf bytes.Buffer
+	w := bufio.NewWriter(&buf)
+	for _, from := range allTypes {
+		for _, to := range allTypes {
+			if from == to {
+				continue
+			}
+			existsKey := from + "_" + to
+			if _, ok := exists[existsKey]; ok {
+				continue
+			}
+			exists[existsKey] = struct{}{}
+
+			if err := t.ExecuteTemplate(w, "Test", &fromTo{From: from, To: to}); err != nil {
 				panic(err)
 			}
 		}
@@ -147,11 +203,13 @@ var funcMap = template.FuncMap{
 		return toName("*" + s)
 	},
 	"TrimSlicePrefix": func(s string) string { return strings.TrimLeft(s, "*[]") },
+	"IsPtr":           func(s string) bool { return strings.HasPrefix(s, "*") },
+	"Join":            func(s ...string) string { return strings.Join(s, "") },
 }
 
 var tmpls = map[string]string{
 	"xPtr_x": `func {{.From | ToName}}_{{.To | ToName}}(i {{.From}}, opt ...Option) {{.To}} {
-	if opt[0] == UseDefaultEmpty && i == nil {
+	if len(opt) == 1 && opt[0] == UseDefaultEmpty && i == nil {
 		return *new({{.To}})
 	}
 	return *i
@@ -181,6 +239,24 @@ var tmpls = map[string]string{
 `,
 	"xPtr_yPtr": `func {{.From | ToName}}_{{.To | ToName}}(i {{.From}}, opt ...Option) {{.To}} {
 		return {{.To | ToNoPtrName}}_{{.To | ToPtrName}}({{.From | ToNoPtrName}}_{{.To | ToNoPtrName}}({{.From | ToPtrName}}_{{.From | ToNoPtrName}}(i, opt...)))
+}
+`,
+	"Test": `func Test_{{.From | ToName}}_{{.To | ToName}}(t *testing.T) {
+	var i {{.From}}
+	var ii {{.To}}
+	ii = {{.From | ToName}}_{{.To | ToName}}(i{{- if .From | IsPtr}}, UseDefaultEmpty{{- end}})
+{{- $i := "i"}} {{- if (.From | IsPtr)}} {{- $i = Join (.From | ToName) "_" (.From | ToNoPtrName) "(i, UseDefaultEmpty)"}} {{- end}}
+{{- $tfunc := Join (.To | ToName) "_" (.From | ToNoPtrName)}}
+{{- if eq (.To | ToName) (.From | ToNoPtrName)}} {{- $tfunc = ""}} {{- end}}
+{{- if not .IsSlice}}
+	if {{$tfunc}}(ii{{- if .To | IsPtr}}, UseDefaultEmpty{{- end}}) != {{$i}} {
+		t.Errorf("error in {{.From | ToName}}_{{.To | ToName}}")
+	}
+{{- else}}
+	if len({{$tfunc}}(ii{{- if .To | IsPtr}}, UseDefaultEmpty{{- end}}) )!= len({{$i}}) {
+		t.Errorf("error in {{.From | ToName}}_{{.To | ToName}}")
+	}
+{{- end}}
 }
 `,
 }
