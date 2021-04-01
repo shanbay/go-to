@@ -205,6 +205,22 @@ var funcMap = template.FuncMap{
 	"TrimSlicePrefix": func(s string) string { return strings.TrimLeft(s, "*[]") },
 	"IsPtr":           func(s string) bool { return strings.HasPrefix(s, "*") },
 	"Join":            func(s ...string) string { return strings.Join(s, "") },
+	"GetInitStmt": func(s string) string {
+		switch {
+		case strings.HasPrefix(s, "*"):
+			return " = nil"
+		case strings.Contains(s, "[]"):
+			return " = " + s + "{*new(" + strings.TrimLeft(s, "*[]") + ")}"
+		case strings.Contains(s, "int") || strings.Contains(s, "float"):
+			return " = 1"
+		case strings.Contains(s, "string"):
+			return ` = ""`
+		case strings.Contains(s, "bool"):
+			return ` = true`
+		default:
+			return ""
+		}
+	},
 }
 
 var tmpls = map[string]string{
@@ -242,8 +258,8 @@ var tmpls = map[string]string{
 }
 `,
 	"Test": `func Test_{{.From | ToName}}_{{.To | ToName}}(t *testing.T) {
-	var i {{.From}}
-	var ii {{.To}}
+	var i {{.From}} {{.From | GetInitStmt}}
+	var ii {{.To}} {{.To | GetInitStmt}}
 	ii = {{.From | ToName}}_{{.To | ToName}}(i{{- if .From | IsPtr}}, UseDefaultEmpty{{- end}})
 {{- $i := "i"}} {{- if (.From | IsPtr)}} {{- $i = Join (.From | ToName) "_" (.From | ToNoPtrName) "(i, UseDefaultEmpty)"}} {{- end}}
 {{- $tfunc := Join (.To | ToName) "_" (.From | ToNoPtrName)}}
