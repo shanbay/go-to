@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   tests:
@@ -14,7 +14,7 @@ jobs:
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
-        go-version: ['1.14', '1.15', '1.16']
+        go-version: ['1.16']
         os: [ubuntu-latest]
 
     env:
@@ -36,11 +36,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
 
       - name: Before tests
-        if: ${{ env.GOENV_VERSION != '1.16' }}
-        run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint
-      - name: Before tests 1.16
-        if: ${{ env.GOENV_VERSION == '1.16' }}
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
       - name: Run tests and lint
