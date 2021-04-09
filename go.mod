@@ -1,4 +1,4 @@
-module github.com/sljeff/go-to
+module github.com/shanbay/go-to
 
 go 1.16
 
